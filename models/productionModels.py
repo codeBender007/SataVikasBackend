@@ -75,3 +75,4 @@ class TPMLossEntry(Base):
 
     # ProductionLog ke attribute 'tpmEntries' ko point karega
     production_log = relationship("ProductionLog", back_populates="tpmEntries")
+

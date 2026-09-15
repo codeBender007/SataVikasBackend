@@ -1,7 +1,7 @@
 import sys
 import os
 
-# Current folder ke parent (Backend root) ko system path mein add karein
+# Add backend root to path
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 if PARENT_DIR not in sys.path:
@@ -24,18 +24,18 @@ def create_initial_admin():
         admin_emp_id = "EMP001"
         plain_password = "admin123"
 
-        # Check karein aur purana admin delete karein
+        # Check and remove existing admin users
         existing_users = db.query(User).filter(
-            (User.username == admin_username) | (User.email == admin_email)
+            (User.username == admin_username) | (User.email == admin_email) | (User.employee_id == admin_emp_id)
         ).all()
 
         if existing_users:
             for old_user in existing_users:
                 db.delete(old_user)
             db.commit()
-            print("🗑️ Purana admin user delete kar diya gaya.")
+            print("[INFO] Existing admin user records removed.")
 
-        # Password hash karein
+        # Hash password
         hashed_password = pwd_context.hash(plain_password)
 
         new_admin = User(
@@ -56,19 +56,20 @@ def create_initial_admin():
         db.refresh(new_admin)
 
         print("========================================")
-        print("✅ New Admin User Successfully Created!")
-        print(f"👉 Username: {admin_username}")
-        print(f"👉 Password: {plain_password}")
-        print(f"👉 Employee ID: {admin_emp_id}")
-        print(f"👉 Role: {new_admin.role}")
+        print("[SUCCESS] New Admin User Successfully Created!")
+        print(f"Username:    {admin_username}")
+        print(f"Password:    {plain_password}")
+        print(f"Employee ID: {admin_emp_id}")
+        print(f"Role:        {new_admin.role}")
+        print(f"Status:      {new_admin.status}")
         print("========================================")
 
     except Exception as e:
         db.rollback()
-        print(f"❌ Error resetting admin user: {e}")
+        print(f"[ERROR] Error resetting admin user: {e}")
 
     finally:
         db.close()
 
 if __name__ == "__main__":
-    create_initial_admin()
+    create_initial_admin()
